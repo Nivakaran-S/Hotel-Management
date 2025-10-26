@@ -59,9 +59,8 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
-  # Application Services (Replace 'yourdockerhubusername' with your actual Docker Hub username)
   api-gateway:
-    image: yourdockerhubusername/hotel-management-api-gateway:latest
+    image: nivakaran/hotel-management-api-gateway:latest
     ports:
       - "8080:8080"
     environment:
@@ -79,7 +78,7 @@ services:
       retries: 3
 
   hotel-service:
-    image: yourdockerhubusername/hotel-management-hotel-service:latest
+    image: nivakaran/hotel-management-hotel-service:latest
     ports:
       - "8081:8080"
     environment:
@@ -99,7 +98,7 @@ services:
       retries: 3
 
   guest-service:
-    image: yourdockerhubusername/hotel-management-guest-service:latest
+    image: nivakaran/hotel-management-guest-service:latest
     ports:
       - "8082:8080"
     environment:
@@ -121,7 +120,7 @@ services:
       retries: 3
 
   booking-service:
-    image: yourdockerhubusername/hotel-management-booking-service:latest
+    image: nivakaran/hotel-management-booking-service:latest
     ports:
       - "8083:8080"
     environment:
@@ -136,7 +135,7 @@ services:
       - redis
 
   restaurant-service:
-    image: yourdockerhubusername/hotel-management-restaurant-service:latest
+    image: nivakaran/hotel-management-restaurant-service:latest
     ports:
       - "8084:8080"
     environment:
@@ -151,7 +150,7 @@ services:
       - redis
 
   order-service:
-    image: yourdockerhubusername/hotel-management-order-service:latest
+    image: nivakaran/hotel-management-order-service:latest
     ports:
       - "8085:8080"
     environment:
@@ -166,7 +165,7 @@ services:
       - redis
 
   payment-service:
-    image: yourdockerhubusername/hotel-management-payment-service:latest
+    image: nivakaran/hotel-management-payment-service:latest
     ports:
       - "8086:8080"
     environment:
@@ -183,7 +182,7 @@ services:
       - redis
 
   staff-service:
-    image: yourdockerhubusername/hotel-management-staff-service:latest
+    image: nivakaran/hotel-management-staff-service:latest
     ports:
       - "8087:8080"
     environment:
@@ -200,7 +199,7 @@ services:
       - redis
 
   notification-service:
-    image: yourdockerhubusername/hotel-management-notification-service:latest
+    image: nivakaran/hotel-management-notification-service:latest
     ports:
       - "8088:8080"
     environment:
