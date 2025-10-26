@@ -1,6 +1,6 @@
 package com.nivakaran.orderservice.config;
 
-import com.techie.microservices.order.client.InventoryClient;
+import com.nivakaran.orderservice.client.InventoryClient;
 import io.micrometer.observation.ObservationRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

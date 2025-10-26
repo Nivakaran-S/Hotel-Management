@@ -1,7 +1,7 @@
 package com.nivakaran.orderservice.controller;
 
-import com.techie.microservices.order.dto.OrderRequest;
-import com.techie.microservices.order.service.OrderService;
+import com.nivakaran.orderservice.dto.OrderRequest;
+import com.nivakaran.orderservice.service.OrderService;
 import groovy.util.logging.Slf4j;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;

@@ -1,10 +1,10 @@
 package com.nivakaran.orderservice.service;
 
-import com.techie.microservices.order.client.InventoryClient;
-import com.techie.microservices.order.dto.OrderRequest;
-import com.techie.microservices.order.event.OrderPlacedEvent;
-import com.techie.microservices.order.model.Order;
-import com.techie.microservices.order.repository.OrderRepository;
+import com.nivakaran.orderservice.client.InventoryClient;
+import com.nivakaran.orderservice.dto.OrderRequest;
+import com.nivakaran.orderservice.event.OrderPlacedEvent;
+import com.nivakaran.orderservice.model.Order;
+import com.nivakaran.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
