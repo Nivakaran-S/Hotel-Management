@@ -1,15 +1,23 @@
 package com.nivakaran.bookingservice.client;
 
+import com.nivakaran.bookingservice.dto.RoomResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.PatchExchange;
 
-@Slf4j
 public interface HotelClient {
+    Logger log = LoggerFactory.getLogger(HotelClient.class);
+
+    @GetExchange("/api/hotel/rooms/{id}")
+    @CircuitBreaker(name = "hotel", fallbackMethod = "fallbackGetRoomById")
+    @Retry(name = "hotel")
+    RoomResponse getRoomById(@PathVariable String id);
 
     @GetExchange("/api/hotel/rooms/{id}/availability")
     @CircuitBreaker(name = "hotel", fallbackMethod = "fallbackRoomAvailability")
@@ -30,6 +38,12 @@ public interface HotelClient {
     @CircuitBreaker(name = "hotel", fallbackMethod = "fallbackUpdateTableStatus")
     @Retry(name = "hotel")
     void updateTableStatus(@PathVariable String id, @RequestParam String status);
+
+    // Fallback methods
+    default RoomResponse fallbackGetRoomById(String id, Throwable throwable) {
+        log.error("Cannot fetch room details for id: {}, error: {}", id, throwable.getMessage());
+        throw new RuntimeException("Cannot fetch room details for id: " + id + ", error: " + throwable.getMessage());
+    }
 
     default boolean fallbackRoomAvailability(String id, Throwable throwable) {
         log.error("Cannot check room availability for id: {}, error: {}", id, throwable.getMessage());

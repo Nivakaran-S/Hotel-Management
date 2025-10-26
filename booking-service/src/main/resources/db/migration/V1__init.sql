@@ -17,11 +17,13 @@ CREATE TABLE room_bookings (
                                booking_date_time DATETIME NOT NULL,
                                last_modified_date_time DATETIME NOT NULL,
                                booked_by VARCHAR(255),
+                               idempotency_key VARCHAR(255) UNIQUE,
                                INDEX idx_booking_number (booking_number),
                                INDEX idx_guest_email (guest_email),
                                INDEX idx_room_id (room_id),
                                INDEX idx_status (status),
-                               INDEX idx_check_in_date (check_in_date)
+                               INDEX idx_check_in_date (check_in_date),
+                               INDEX idx_idempotency_key (idempotency_key)
 );
 
 CREATE TABLE table_bookings (

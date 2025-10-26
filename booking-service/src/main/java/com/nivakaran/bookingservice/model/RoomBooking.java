@@ -9,11 +9,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "room_bookings")
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class RoomBooking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,4 +42,102 @@ public class RoomBooking {
 
     @Column(unique = true)
     private String idempotencyKey;
+
+    // Builder pattern manually
+    public static RoomBookingBuilder builder() {
+        return new RoomBookingBuilder();
+    }
+
+    public static class RoomBookingBuilder {
+        private RoomBooking booking = new RoomBooking();
+
+        public RoomBookingBuilder bookingNumber(String bookingNumber) {
+            booking.bookingNumber = bookingNumber;
+            return this;
+        }
+
+        public RoomBookingBuilder idempotencyKey(String idempotencyKey) {
+            booking.idempotencyKey = idempotencyKey;
+            return this;
+        }
+
+        public RoomBookingBuilder roomId(String roomId) {
+            booking.roomId = roomId;
+            return this;
+        }
+
+        public RoomBookingBuilder guestName(String guestName) {
+            booking.guestName = guestName;
+            return this;
+        }
+
+        public RoomBookingBuilder guestEmail(String guestEmail) {
+            booking.guestEmail = guestEmail;
+            return this;
+        }
+
+        public RoomBookingBuilder guestPhone(String guestPhone) {
+            booking.guestPhone = guestPhone;
+            return this;
+        }
+
+        public RoomBookingBuilder checkInDate(LocalDate checkInDate) {
+            booking.checkInDate = checkInDate;
+            return this;
+        }
+
+        public RoomBookingBuilder checkOutDate(LocalDate checkOutDate) {
+            booking.checkOutDate = checkOutDate;
+            return this;
+        }
+
+        public RoomBookingBuilder numberOfGuests(Integer numberOfGuests) {
+            booking.numberOfGuests = numberOfGuests;
+            return this;
+        }
+
+        public RoomBookingBuilder numberOfNights(Integer numberOfNights) {
+            booking.numberOfNights = numberOfNights;
+            return this;
+        }
+
+        public RoomBookingBuilder roomPrice(BigDecimal roomPrice) {
+            booking.roomPrice = roomPrice;
+            return this;
+        }
+
+        public RoomBookingBuilder totalAmount(BigDecimal totalAmount) {
+            booking.totalAmount = totalAmount;
+            return this;
+        }
+
+        public RoomBookingBuilder status(BookingStatus status) {
+            booking.status = status;
+            return this;
+        }
+
+        public RoomBookingBuilder specialRequests(String specialRequests) {
+            booking.specialRequests = specialRequests;
+            return this;
+        }
+
+        public RoomBookingBuilder bookingDateTime(LocalDateTime bookingDateTime) {
+            booking.bookingDateTime = bookingDateTime;
+            return this;
+        }
+
+        public RoomBookingBuilder lastModifiedDateTime(LocalDateTime lastModifiedDateTime) {
+            booking.lastModifiedDateTime = lastModifiedDateTime;
+            return this;
+        }
+
+        public RoomBookingBuilder bookedBy(String bookedBy) {
+            booking.bookedBy = bookedBy;
+            return this;
+        }
+
+        public RoomBooking build() {
+            return booking;
+        }
+    }
 }

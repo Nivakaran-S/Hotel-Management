@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public interface RoomBookingRepository extends JpaRepository<RoomBooking, Long> {
     Optional<RoomBooking> findByBookingNumber(String bookingNumber);
+    Optional<RoomBooking> findByIdempotencyKey(String idempotencyKey);
     List<RoomBooking> findByGuestEmail(String guestEmail);
     List<RoomBooking> findByStatus(BookingStatus status);
     List<RoomBooking> findByRoomIdAndStatus(String roomId, BookingStatus status);

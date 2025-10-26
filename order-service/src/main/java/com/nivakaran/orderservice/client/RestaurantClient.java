@@ -6,8 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.service.annotation.GetExchange;
 
-@Slf4j
-public interface RestuarantClient {
+public interface RestaurantClient {
 
     @GetExchange("/api/restaurant/menu/{id}/available")
     @CircuitBreaker(name = "restaurant", fallbackMethod = "fallbackMenuAvailability")
@@ -15,7 +14,7 @@ public interface RestuarantClient {
     boolean isMenuItemAvailable(@PathVariable String id);
 
     default boolean fallbackMenuAvailability(String id, Throwable throwable) {
-        System.out.println("Cannot check menu item availability for id: {}, error: {}");
+        System.out.println("Cannot check menu item availability for id: " + id + ", error: " + throwable.getMessage());
         return false;
     }
 }
