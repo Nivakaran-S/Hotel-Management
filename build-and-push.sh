@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Configuration for Docker Hub (Free)
-DOCKER_USERNAME="yourdockerhubusername"  # Replace with your Docker Hub username
+DOCKER_USERNAME="nivakaran"  # Replace with your Docker Hub username
 REGISTRY="docker.io/$DOCKER_USERNAME"
 PROJECT_NAME="hotel-management"
 VERSION="latest"
