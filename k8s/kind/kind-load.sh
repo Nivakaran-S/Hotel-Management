@@ -10,11 +10,15 @@ docker pull grafana/loki:main
 docker pull prom/prometheus:v2.46.0
 docker pull grafana/tempo:2.2.2
 docker pull grafana/grafana:10.1.0
-docker pull saiupadhyayula007/new-api-gateway:latest
-docker pull saiupadhyayula007/new-product-service:latest
-docker pull saiupadhyayula007/new-order-service:latest
-docker pull saiupadhyayula007/new-inventory-service:latest
-docker pull saiupadhyayula007/new-notification-service:latest
+docker pull nivakaran/new-api-gateway:latest
+docker pull nivakaran/new-booking-service:latest
+docker pull nivakaran/new-order-service:latest
+docker pull nivakaran/new-guest-service:latest
+docker pull nivakaran/new-notification-service:latest
+docker pull nivakaran/new-hotel-service:latest
+docker pull nivakaran/new-restaurant-service:latest
+docker pull nivakaran/new-staff-service:latest
+docker pull nivakaran/new-payment-service:latest
 
 kind load docker-image -n microservices mongo:7.0.5
 kind load docker-image -n microservices mysql:8.3.0
@@ -33,3 +37,13 @@ kind load docker-image -n microservices saiupadhyayula007/new-product-service:la
 kind load docker-image -n microservices saiupadhyayula007/new-order-service:latest
 kind load docker-image -n microservices saiupadhyayula007/new-inventory-service:latest
 kind load docker-image -n microservices saiupadhyayula007/new-notification-service:latest
+
+kind load docker-image -n microservices nivakaran/new-api-gateway:latest
+kind load docker-image -n microservices pull nivakaran/new-booking-service:latest
+kind load docker-image -n microservices pull nivakaran/new-order-service:latest
+kind load docker-image -n microservices pull nivakaran/new-guest-service:latest
+kind load docker-image -n microservices pull nivakaran/new-notification-service:latest
+kind load docker-image -n microservices pull nivakaran/new-hotel-service:latest
+kind load docker-image -n microservices pull nivakaran/new-restaurant-service:latest
+kind load docker-image -n microservices pull nivakaran/new-staff-service:latest
+kind load docker-image -n microservices pull nivakaran/new-payment-service:latest
