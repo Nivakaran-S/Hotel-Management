@@ -15,7 +15,7 @@ public interface RestuarantClient {
     boolean isMenuItemAvailable(@PathVariable String id);
 
     default boolean fallbackMenuAvailability(String id, Throwable throwable) {
-        log.error("Cannot check menu item availability for id: {}, error: {}", id, throwable.getMessage());
+        System.out.println("Cannot check menu item availability for id: {}, error: {}");
         return false;
     }
 }

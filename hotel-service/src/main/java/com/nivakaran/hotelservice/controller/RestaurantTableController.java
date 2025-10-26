@@ -4,7 +4,7 @@ import com.nivakaran.hotelservice.dto.TableAvailabilityRequest;
 import com.nivakaran.hotelservice.dto.TableRequest;
 import com.nivakaran.hotelservice.dto.TableResponse;
 import com.nivakaran.hotelservice.model.TableStatus;
-import com.nivakaran.hotelservice.service.RestuarantTableService;
+import com.nivakaran.hotelservice.service.RestaurantTableService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.List;
 @Validated
 public class RestaurantTableController {
 
-    private final RestuarantTableService tableService;
+    private final RestaurantTableService tableService;
 
     @PostMapping
     @PreAuthorize("hasRole('admin') or hasRole('staff')")
