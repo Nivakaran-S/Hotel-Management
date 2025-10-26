@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "name": "BookingConfirmedEvent",
+  "namespace": "com.nivakaran.bookingservice.event",
+  "fields": [
+    { "name": "bookingNumber", "type": "string" },
+    { "name": "guestEmail", "type": "string" },
+    { "name": "guestName", "type": "string" },
+    { "name": "bookingType", "type": "string" },
+    { "name": "checkInDate", "type": "string" },
+    { "name": "checkOutDate", "type": "string" },
+    { "name": "totalAmount", "type": "string" }
+  ]
+}
