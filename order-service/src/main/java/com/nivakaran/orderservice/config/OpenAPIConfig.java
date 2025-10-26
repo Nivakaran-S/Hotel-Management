@@ -14,11 +14,11 @@ public class OpenAPIConfig {
     public OpenAPI orderServiceAPI() {
         return new OpenAPI()
                 .info(new Info().title("Order Service API")
-                        .description("This is the REST API for Order Service")
-                        .version("v0.0.1")
+                        .description("This is the REST API for Order Service - Manages restaurant food orders")
+                        .version("v1.0.0")
                         .license(new License().name("Apache 2.0")))
                 .externalDocs(new ExternalDocumentation()
-                        .description("You can refer to the Order Service Wiki Documentation")
-                        .url("https://order-service-dummy-url.com/docs"));
+                        .description("Order Service Documentation")
+                        .url("https://order-service-docs.com"));
     }
 }

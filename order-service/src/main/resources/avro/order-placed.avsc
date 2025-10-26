@@ -1,11 +1,12 @@
 {
   "type": "record",
   "name": "OrderPlacedEvent",
-  "namespace": "com.techie.microservices.order.event",
+  "namespace": "com.nivakaran.orderservice.event",
   "fields": [
     { "name": "orderNumber", "type": "string" },
-    { "name": "email", "type": "string" },
-    { "name": "firstName", "type": "string" },
-    { "name": "lastName", "type": "string" }
+    { "name": "guestEmail", "type": "string" },
+    { "name": "guestName", "type": "string" },
+    { "name": "orderType", "type": "string" },
+    { "name": "totalAmount", "type": "string" }
   ]
 }

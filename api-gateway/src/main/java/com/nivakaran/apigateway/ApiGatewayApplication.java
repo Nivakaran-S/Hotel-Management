@@ -1,8 +1,7 @@
-package com.techie.microservices.gateway;
+package com.nivakaran.apigateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
 public class ApiGatewayApplication {

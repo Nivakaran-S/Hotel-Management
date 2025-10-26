@@ -39,9 +39,6 @@
         <module name="hotel-service" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="booking-service" target="17" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
