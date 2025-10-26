@@ -19,10 +19,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-boot.version>3.3.5</spring-boot.version>
         <java.version>17</java.version>
-
-        <!-- Docker properties - with default values -->
-        <dockerUsername>yourdockerusername</dockerUsername>
-        <dockerPassword>SET_ME_IN_SETTINGS_XML</dockerPassword>
+        <jib-maven-plugin.version>3.4.0</jib-maven-plugin.version>
+        <springdoc-openapi.version>2.2.0</springdoc-openapi.version>
+        <!-- Docker properties: all lowercase, valid for Docker -->
+        <dockerUsername>nivakaran</dockerUsername>
+        <docker.image.prefix>hotelmanagement</docker.image.prefix>
     </properties>
 
     <modules>
@@ -46,6 +47,21 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc-openapi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-gateway</artifactId>
+                <version>4.1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-gateway-mvc</artifactId>
+                <version>4.2.1</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -64,6 +80,7 @@
                         </execution>
                     </executions>
                 </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -73,8 +90,33 @@
                         <target>${java.version}</target>
                     </configuration>
                 </plugin>
+
+                <!-- Jib Plugin: No Dockerfile Needed, image names are valid lowercase -->
+                <plugin>
+                    <groupId>com.google.cloud.tools</groupId>
+                    <artifactId>jib-maven-plugin</artifactId>
+                    <version>${jib-maven-plugin.version}</version>
+                    <configuration>
+                        <from>
+                            <image>eclipse-temurin:17-jre-alpine</image>
+                        </from>
+                        <to>
+                            <image>docker.io/${dockerUsername}/${docker.image.prefix}-${project.artifactId}:latest</image>
+                            <tags>
+                                <tag>${project.version}</tag>
+                            </tags>
+                        </to>
+                        <container>
+                            <ports>
+                                <port>8080</port>
+                            </ports>
+                            <format>OCI</format>
+                            <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                            <user>1000:1000</user>
+                        </container>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
-
 </project>
