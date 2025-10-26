@@ -1,0 +1,58 @@
+global:
+  scrape_interval: 2s
+  evaluation_interval: 2s
+
+scrape_configs:
+  - job_name: 'api-gateway'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:9000'] ## only for demo purposes don't use host.docker.internal in production
+  - job_name: 'booking-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8080'] ## only for demo purposes don't use host.docker.internal in production
+        labels:
+          application: 'Booking Service'
+  - job_name: 'order-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8081'] ## only for demo purposes don't use host.docker.internal in production
+        labels:
+          application: 'Order Service'
+  - job_name: 'guest-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8082'] ## only for demo purposes don't use host.docker.internal in production
+        labels:
+          application: 'Guest Service'
+  - job_name: 'notification-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8083'] ## only for demo purposes don't use host.docker.internal in production
+        labels:
+          application: 'Notification Service'
+  - job_name: 'hotel-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:8084' ] ## only for demo purposes don't use host.docker.internal in production
+        labels:
+          application: 'Hotel Service'
+  - job_name: 'payment-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:8085' ] ## only for demo purposes don't use host.docker.internal in production
+        labels:
+          application: 'Payment Service'
+  - job_name: 'restuarant-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:8086' ] ## only for demo purposes don't use host.docker.internal in production
+        labels:
+          application: 'Restuarant Service'
+  - job_name: 'staff-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:8087' ] ## only for demo purposes don't use host.docker.internal in production
+        labels:
+          application: 'Staff Service'
+

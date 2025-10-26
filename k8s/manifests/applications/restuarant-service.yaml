@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: restuarant-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: restuarant-service
+  template:
+    metadata:
+      labels:
+        app: restuarant-service
+    spec:
+      containers:
+        - name: restuarant-service
+          image: nivakaran/new-restuarant-service:latest
+          env:
+            - name: SPRING_DATA_MONGODB_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: SPRING_DATA_MONGODB_URI
+                  name: product-service-config
+            - name: LOKI_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: LOKI_URL
+                  name: common-config
+            - name: MANAGEMENT_ZIPKIN_TRACING_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  key: MANAGEMENT_ZIPKIN_TRACING_ENDPOINT
+                  name: common-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: restuarant-service
+spec:
+  selector:
+    app: restuarant-service
+  ports:
+    - protocol: TCP
+      port: 8086
+      targetPort: 8086
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: restuarant-service-config
+data:
+  SPRING_DATA_MONGODB_URI: "mongodb://root:password@mongodb.default.svc.cluster.local:27017/restuarant-service?authSource=admin"
