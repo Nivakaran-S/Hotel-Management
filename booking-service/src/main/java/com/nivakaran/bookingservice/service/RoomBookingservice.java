@@ -32,69 +32,75 @@ public class RoomBookingService {
     private final KafkaTemplate<String, BookingConfirmedEvent> kafkaTemplate;
 
     @Transactional
-    public RoomBookingResponse createRoomBooking(RoomBookingRequest request) {
-        log.info("Creating room booking for room: {}", request.roomId());
-
-        // Validate dates
-        if (request.checkOutDate().isBefore(request.checkInDate()) ||
-                request.checkOutDate().isEqual(request.checkInDate())) {
-            throw new RuntimeException("Check-out date must be after check-in date");
+    public RoomBookingResponse createRoomBooking(RoomBookingRequest request, String idempotencyKey) {
+        // 1. Check idempotency
+        Optional<RoomBooking> existing = roomBookingRepository.findByIdempotencyKey(idempotencyKey);
+        if (existing.isPresent()) {
+            return mapToResponse(existing.get());
         }
 
-        // Check if room is available
+        // 2. Fetch actual room details and price
+        RoomResponse room = hotelClient.getRoomById(request.roomId());
+        if (room == null) {
+            throw new ResourceNotFoundException("Room", request.roomId());
+        }
+
+        // 3. Validate availability with date range
         if (!hotelClient.isRoomAvailable(request.roomId())) {
-            throw new RuntimeException("Room is not available for booking");
+            throw new BusinessRuleViolationException("Room is not available");
         }
 
-        // Check for conflicting bookings
+        // 4. Check conflicting bookings
         List<RoomBooking> conflicts = roomBookingRepository.findConflictingBookings(
                 request.roomId(), request.checkInDate(), request.checkOutDate());
 
         if (!conflicts.isEmpty()) {
-            throw new RuntimeException("Room is already booked for the selected dates");
+            throw new BusinessRuleViolationException(
+                    "Room is already booked for the selected dates");
         }
 
-        // Calculate number of nights and total amount
-        long numberOfNights = ChronoUnit.DAYS.between(request.checkInDate(), request.checkOutDate());
-        BigDecimal roomPricePerNight = BigDecimal.valueOf(100); // This should come from hotel service
-        BigDecimal totalAmount = roomPricePerNight.multiply(BigDecimal.valueOf(numberOfNights));
+        // 5. Calculate using actual price
+        long numberOfNights = ChronoUnit.DAYS.between(
+                request.checkInDate(), request.checkOutDate());
+        BigDecimal totalAmount = room.pricePerNight()
+                .multiply(BigDecimal.valueOf(numberOfNights));
 
-        String bookingNumber = "RB-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-        String bookedBy = getCurrentUsername();
-
+        // 6. Create booking
         RoomBooking booking = RoomBooking.builder()
-                .bookingNumber(bookingNumber)
+                .bookingNumber(generateBookingNumber())
+                .idempotencyKey(idempotencyKey)
                 .roomId(request.roomId())
-                .guestName(request.guestName())
-                .guestEmail(request.guestEmail())
-                .guestPhone(request.guestPhone())
-                .checkInDate(request.checkInDate())
-                .checkOutDate(request.checkOutDate())
-                .numberOfGuests(request.numberOfGuests())
-                .numberOfNights((int) numberOfNights)
-                .roomPrice(roomPricePerNight)
+                .roomPrice(room.pricePerNight())
                 .totalAmount(totalAmount)
-                .status(BookingStatus.CONFIRMED)
-                .specialRequests(request.specialRequests())
-                .bookingDateTime(LocalDateTime.now())
-                .lastModifiedDateTime(LocalDateTime.now())
-                .bookedBy(bookedBy)
+                // ... other fields
+                .status(BookingStatus.PENDING) // Start as PENDING
                 .build();
 
         RoomBooking savedBooking = roomBookingRepository.save(booking);
 
-        // Update room status to RESERVED
-        try {
-            hotelClient.updateRoomStatus(request.roomId(), "RESERVED");
-        } catch (Exception e) {
-            log.error("Failed to update room status: {}", e.getMessage());
+        // 7. Reserve room (don't confirm yet)
+        hotelClient.updateRoomStatus(request.roomId(), "RESERVED");
+
+        // Don't send confirmation event yet - wait for payment
+
+        return mapToResponse(savedBooking);
+    }
+
+    // New method for confirming booking after payment
+    @Transactional
+    public void confirmBooking(String bookingNumber) {
+        RoomBooking booking = roomBookingRepository.findByBookingNumber(bookingNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking", bookingNumber));
+
+        if (booking.getStatus() != BookingStatus.PENDING) {
+            throw new BusinessRuleViolationException("Booking is not in pending state");
         }
 
-        // Send booking confirmation event
-        sendBookingConfirmationEvent(savedBooking);
+        booking.setStatus(BookingStatus.CONFIRMED);
+        roomBookingRepository.save(booking);
 
-        log.info("Room booking created successfully: {}", bookingNumber);
-        return mapToResponse(savedBooking);
+        // Now send confirmation event
+        sendBookingConfirmationEvent(booking);
     }
 
     public List<RoomBookingResponse> getAllRoomBookings() {

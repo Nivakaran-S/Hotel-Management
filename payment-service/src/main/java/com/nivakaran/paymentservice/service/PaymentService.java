@@ -26,40 +26,97 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public PaymentResponse processPayment(PaymentRequest request) {
+    public PaymentResponse processPayment(PaymentRequest request, String idempotencyKey) {
         log.info("Processing payment for booking: {}", request.bookingNumber());
 
+        // 1. Idempotency check
+        Optional<Payment> existing = paymentRepository.findByIdempotencyKey(idempotencyKey);
+        if (existing.isPresent()) {
+            log.info("Payment already processed, returning existing result");
+            return mapToResponse(existing.get());
+        }
+
+        // 2. Validate booking exists
+        BookingValidationResponse booking = validateBooking(request.bookingNumber(),
+                request.paymentType());
+
+        // 3. Check for duplicate successful payments
+        List<Payment> existingPayments = paymentRepository
+                .findByBookingNumberAndPaymentStatus(request.bookingNumber(), PaymentStatus.SUCCESS);
+
+        if (!existingPayments.isEmpty()) {
+            throw new PaymentException("Payment already completed for this booking");
+        }
+
+        // 4. Verify amount matches booking
+        if (booking.totalAmount().compareTo(request.amount()) != 0) {
+            throw new PaymentException(String.format(
+                    "Payment amount (%s) does not match booking amount (%s)",
+                    request.amount(), booking.totalAmount()));
+        }
+
+        // 5. Process payment
         String paymentId = "PAY-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-        String processedBy = getCurrentUsername();
+        PaymentGatewayResponse gatewayResponse = processPaymentGateway(request);
 
-        // Simulate payment processing
-        boolean paymentSuccess = simulatePaymentGateway(request);
-
+        // 6. Create payment record
         Payment payment = Payment.builder()
                 .paymentId(paymentId)
+                .idempotencyKey(idempotencyKey)
                 .bookingNumber(request.bookingNumber())
                 .paymentType(request.paymentType())
                 .amount(request.amount())
                 .currency(request.currency())
                 .paymentMethod(request.paymentMethod())
-                .paymentStatus(paymentSuccess ? PaymentStatus.SUCCESS : PaymentStatus.FAILED)
-                .transactionId(paymentSuccess ? "TXN-" + UUID.randomUUID().toString() : null)
-                .guestEmail(request.guestEmail())
-                .guestName(request.guestName())
-                .description(request.description())
+                .paymentStatus(gatewayResponse.isSuccess() ?
+                        PaymentStatus.SUCCESS : PaymentStatus.FAILED)
+                .transactionId(gatewayResponse.transactionId())
+                .failureReason(gatewayResponse.failureReason())
                 .paymentDateTime(LocalDateTime.now())
                 .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .processedBy(processedBy)
-                .failureReason(paymentSuccess ? null : "Payment declined by gateway")
-                .cardLast4Digits(request.cardLast4Digits())
-                .cardType(request.cardType())
                 .build();
 
         Payment savedPayment = paymentRepository.save(payment);
-        log.info("Payment processed: {} - Status: {}", savedPayment.getPaymentId(), savedPayment.getPaymentStatus());
+
+        // 7. If payment successful, confirm booking
+        if (savedPayment.getPaymentStatus() == PaymentStatus.SUCCESS) {
+            confirmBookingAfterPayment(request.bookingNumber(), request.paymentType());
+        }
+
+        log.info("Payment processed: {} - Status: {}",
+                savedPayment.getPaymentId(), savedPayment.getPaymentStatus());
 
         return mapToResponse(savedPayment);
+    }
+
+    // Validate booking exists and get amount
+    private BookingValidationResponse validateBooking(String bookingNumber,
+                                                      PaymentType paymentType) {
+        try {
+            return switch (paymentType) {
+                case ROOM_BOOKING -> bookingClient.validateRoomBooking(bookingNumber);
+                case TABLE_BOOKING -> bookingClient.validateTableBooking(bookingNumber);
+                case FOOD_ORDER -> orderClient.validateOrder(bookingNumber);
+                default -> throw new InvalidRequestException("Invalid payment type");
+            };
+        } catch (Exception e) {
+            throw new BusinessRuleViolationException(
+                    "Booking not found or invalid: " + bookingNumber);
+        }
+    }
+
+    // Confirm booking after successful payment
+    private void confirmBookingAfterPayment(String bookingNumber, PaymentType paymentType) {
+        try {
+            switch (paymentType) {
+                case ROOM_BOOKING -> bookingClient.confirmRoomBooking(bookingNumber);
+                case TABLE_BOOKING -> bookingClient.confirmTableBooking(bookingNumber);
+                case FOOD_ORDER -> orderClient.confirmOrder(bookingNumber);
+            }
+        } catch (Exception e) {
+            log.error("Failed to confirm booking after payment: {}", e.getMessage());
+            // This is critical - might need compensating transaction
+        }
     }
 
     public List<PaymentResponse> getAllPayments() {

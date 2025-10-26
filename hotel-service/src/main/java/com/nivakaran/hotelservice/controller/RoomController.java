@@ -77,4 +77,10 @@ public class RoomController {
     public boolean isRoomAvailable(@PathVariable String id) {
         return roomService.isRoomAvailable(id);
     }
+
+    @GetMapping("/{id}/details")
+    @Cacheable(value = "roomDetails", key = "#id")
+    public RoomDetailsResponse getRoomDetails(@PathVariable String id) {
+        return roomService.getRoomDetails(id);
+    }
 }

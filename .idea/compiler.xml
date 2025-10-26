@@ -15,14 +15,15 @@
         <outputRelativeToContentRoot value="true" />
         <module name="notification-service" />
       </profile>
-      <profile name="Annotation profile for order-service" enabled="true">
+      <profile name="Annotation profile for api-gateway" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
         </processorPath>
-        <module name="order-service" />
+        <module name="api-gateway" />
       </profile>
       <profile name="Annotation profile for staff-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -30,18 +31,22 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
         </processorPath>
-        <module name="restuarant-service" />
         <module name="staff-service" />
         <module name="payment-service" />
+        <module name="order-service" />
         <module name="guest-service" />
         <module name="hotel-service" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="booking-service" target="17" />
+      <module name="restaurant-service" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="api-gateway" options="-parameters" />
       <module name="booking-service" options="-parameters" />
       <module name="guest-service" options="-parameters" />
       <module name="guest-service.main" options="-parameters" />
@@ -52,7 +57,7 @@
       <module name="notification-service" options="-parameters" />
       <module name="order-service" options="-parameters" />
       <module name="payment-service" options="-parameters" />
-      <module name="restuarant-service" options="-parameters" />
+      <module name="restaurant-service" options="-parameters" />
       <module name="staff-service" options="-parameters" />
     </option>
   </component>

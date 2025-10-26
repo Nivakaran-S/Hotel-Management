@@ -66,4 +66,6 @@ public class Payment {
     private String cardLast4Digits; // For card payments
 
     private String cardType; // VISA, MASTERCARD, etc.
+    @Column(unique = true)
+    private String idempotencyKey;
 }

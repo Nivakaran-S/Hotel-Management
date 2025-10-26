@@ -1,16 +1,12 @@
 version: '3.8'
 
-version: '3.8'
-
 services:
-  # Infrastructure Services (Free/Open Source)
+  # Infrastructure Services
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    volumes:
-      - zookeeper_data:/var/lib/zookeeper/data
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -25,8 +21,6 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
       - zookeeper
-    volumes:
-      - kafka_data:/var/lib/kafka/data
 
   redis:
     image: redis:7-alpine
@@ -43,7 +37,6 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password123
-      MONGO_INITDB_DATABASE: hotel_management
     volumes:
       - mongodb_data:/data/db
 
@@ -59,32 +52,22 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
-  # Application Services (Replace 'yourdockerhubusername' with your actual Docker Hub username)
+  # Application Services (using cloud images)
   api-gateway:
-    image: yourdockerhubusername/hotel-management-api-gateway:latest
+    image: your-registry.azurecr.io/hotel-management-api-gateway:latest
     ports:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SERVER_PORT=8080
-      - SPRING_REDIS_HOST=redis
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka:8761/eureka
     depends_on:
       - kafka
       - redis
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   hotel-service:
-    image: yourdockerhubusername/hotel-management-hotel-service:latest
-    ports:
-      - "8081:8080"
+    image: your-registry.azurecr.io/hotel-management-hotel-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SERVER_PORT=8080
       - SPRING_DATA_MONGODB_URI=mongodb://admin:password123@mongodb:27017/hotel_db?authSource=admin
       - SPRING_REDIS_HOST=redis
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
@@ -92,19 +75,11 @@ services:
       - mongodb
       - kafka
       - redis
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   guest-service:
-    image: yourdockerhubusername/hotel-management-guest-service:latest
-    ports:
-      - "8082:8080"
+    image: your-registry.azurecr.io/hotel-management-guest-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SERVER_PORT=8080
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/hotel_management
       - SPRING_DATASOURCE_USERNAME=hotel_user
       - SPRING_DATASOURCE_PASSWORD=hotel_pass
@@ -114,19 +89,11 @@ services:
       - mysql
       - kafka
       - redis
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   booking-service:
-    image: yourdockerhubusername/hotel-management-booking-service:latest
-    ports:
-      - "8083:8080"
+    image: your-registry.azurecr.io/hotel-management-booking-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SERVER_PORT=8080
       - SPRING_DATA_MONGODB_URI=mongodb://admin:password123@mongodb:27017/booking_db?authSource=admin
       - SPRING_REDIS_HOST=redis
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
@@ -136,12 +103,9 @@ services:
       - redis
 
   restaurant-service:
-    image: yourdockerhubusername/hotel-management-restaurant-service:latest
-    ports:
-      - "8084:8080"
+    image: your-registry.azurecr.io/hotel-management-restaurant-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SERVER_PORT=8080
       - SPRING_DATA_MONGODB_URI=mongodb://admin:password123@mongodb:27017/restaurant_db?authSource=admin
       - SPRING_REDIS_HOST=redis
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
@@ -151,12 +115,9 @@ services:
       - redis
 
   order-service:
-    image: yourdockerhubusername/hotel-management-order-service:latest
-    ports:
-      - "8085:8080"
+    image: your-registry.azurecr.io/hotel-management-order-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SERVER_PORT=8080
       - SPRING_DATA_MONGODB_URI=mongodb://admin:password123@mongodb:27017/order_db?authSource=admin
       - SPRING_REDIS_HOST=redis
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
@@ -166,12 +127,9 @@ services:
       - redis
 
   payment-service:
-    image: yourdockerhubusername/hotel-management-payment-service:latest
-    ports:
-      - "8086:8080"
+    image: your-registry.azurecr.io/hotel-management-payment-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SERVER_PORT=8080
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/hotel_management
       - SPRING_DATASOURCE_USERNAME=hotel_user
       - SPRING_DATASOURCE_PASSWORD=hotel_pass
@@ -183,12 +141,9 @@ services:
       - redis
 
   staff-service:
-    image: yourdockerhubusername/hotel-management-staff-service:latest
-    ports:
-      - "8087:8080"
+    image: your-registry.azurecr.io/hotel-management-staff-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SERVER_PORT=8080
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/hotel_management
       - SPRING_DATASOURCE_USERNAME=hotel_user
       - SPRING_DATASOURCE_PASSWORD=hotel_pass
@@ -200,12 +155,9 @@ services:
       - redis
 
   notification-service:
-    image: yourdockerhubusername/hotel-management-notification-service:latest
-    ports:
-      - "8088:8080"
+    image: your-registry.azurecr.io/hotel-management-notification-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SERVER_PORT=8080
       - SPRING_DATA_MONGODB_URI=mongodb://admin:password123@mongodb:27017/notification_db?authSource=admin
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
     depends_on:
@@ -216,9 +168,3 @@ volumes:
   mongodb_data:
   mysql_data:
   redis_data:
-  kafka_data:
-  zookeeper_data:
-
-networks:
-  default:
-    name: hotel-management-network

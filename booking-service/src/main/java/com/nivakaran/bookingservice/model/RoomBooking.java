@@ -41,4 +41,7 @@ public class RoomBooking {
     private LocalDateTime bookingDateTime;
     private LocalDateTime lastModifiedDateTime;
     private String bookedBy;
+
+    @Column(unique = true)
+    private String idempotencyKey;
 }
