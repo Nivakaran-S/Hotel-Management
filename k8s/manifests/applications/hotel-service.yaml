@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: inventory-service
-          image: nivakaran/new-hotel-service:latest
+          image: nivakaran/hotelmanagement-hotel-service:latest
           env:
             - name: SPRING_DATASOURCE_URL
               valueFrom:

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: booking-service
-          image: nivakaran/new-booking-service:latest
+          image: nivakaran/hotelmanagement-booking-service:latest
           env:
             - name: SPRING_DATA_MONGODB_URI
               valueFrom:

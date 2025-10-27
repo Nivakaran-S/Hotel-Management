@@ -18,9 +18,14 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-boot.version>3.3.5</spring-boot.version>
+        <spring-cloud.version>2023.0.3</spring-cloud.version>
         <java.version>17</java.version>
         <jib-maven-plugin.version>3.4.0</jib-maven-plugin.version>
         <springdoc-openapi.version>2.2.0</springdoc-openapi.version>
+        <resilience4j.version>2.1.0</resilience4j.version>
+        <loki-logback.version>1.5.2</loki-logback.version>
+        <avro.version>1.11.3</avro.version>
+        <kafka-avro-serializer.version>7.5.1</kafka-avro-serializer.version>
         <!-- Docker properties: all lowercase, valid for Docker -->
         <dockerUsername>nivakaran</dockerUsername>
         <docker.image.prefix>hotelmanagement</docker.image.prefix>
@@ -40,6 +45,7 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Spring Boot BOM -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -47,20 +53,84 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <!-- Spring Cloud BOM -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- SpringDoc OpenAPI -->
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${springdoc-openapi.version}</version>
             </dependency>
+
+            <!-- Spring Cloud Gateway -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-gateway</artifactId>
                 <version>4.1.4</version>
             </dependency>
+
+            <!-- Spring Cloud Gateway MVC -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-gateway-mvc</artifactId>
                 <version>4.2.1</version>
+            </dependency>
+
+            <!-- Resilience4j Spring Boot 3 -->
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-spring-boot3</artifactId>
+                <version>${resilience4j.version}</version>
+            </dependency>
+
+            <!-- Resilience4j Circuit Breaker -->
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-circuitbreaker</artifactId>
+                <version>${resilience4j.version}</version>
+            </dependency>
+
+            <!-- Resilience4j Retry -->
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-retry</artifactId>
+                <version>${resilience4j.version}</version>
+            </dependency>
+
+            <!-- Resilience4j Micrometer -->
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-micrometer</artifactId>
+                <version>${resilience4j.version}</version>
+            </dependency>
+
+            <!-- Loki Logback Appender -->
+            <dependency>
+                <groupId>com.github.loki4j</groupId>
+                <artifactId>loki-logback-appender</artifactId>
+                <version>${loki-logback.version}</version>
+            </dependency>
+
+            <!-- Apache Avro -->
+            <dependency>
+                <groupId>org.apache.avro</groupId>
+                <artifactId>avro</artifactId>
+                <version>${avro.version}</version>
+            </dependency>
+
+            <!-- Confluent Kafka Avro Serializer -->
+            <dependency>
+                <groupId>io.confluent</groupId>
+                <artifactId>kafka-avro-serializer</artifactId>
+                <version>${kafka-avro-serializer.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -91,6 +161,26 @@
                     </configuration>
                 </plugin>
 
+                <!-- Avro Maven Plugin -->
+                <plugin>
+                    <groupId>org.apache.avro</groupId>
+                    <artifactId>avro-maven-plugin</artifactId>
+                    <version>${avro.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>schema</goal>
+                            </goals>
+                            <configuration>
+                                <sourceDirectory>${project.basedir}/src/main/resources/avro</sourceDirectory>
+                                <outputDirectory>${project.build.directory}/generated-sources/avro</outputDirectory>
+                                <stringType>String</stringType>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
                 <!-- Jib Plugin: No Dockerfile Needed, image names are valid lowercase -->
                 <plugin>
                     <groupId>com.google.cloud.tools</groupId>
@@ -119,4 +209,12 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <!-- Confluent Repository for Kafka Avro Serializer -->
+    <repositories>
+        <repository>
+            <id>confluent</id>
+            <url>https://packages.confluent.io/maven/</url>
+        </repository>
+    </repositories>
 </project>
